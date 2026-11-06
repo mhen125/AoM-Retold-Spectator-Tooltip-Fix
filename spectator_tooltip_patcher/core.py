@@ -362,9 +362,17 @@ class Profile:
                 continue
             target = self._target(entry["mod"])
             current = sha(target.read_bytes()) if target.is_file() else None
+            backup = self._backup(entry["backup"])
+            if current != entry["patched_sha256"]:
+                action = "skip_changed"
+            elif not backup.is_file():
+                action = "skip_missing_backup"
+            elif sha(backup.read_bytes()) != entry["original_sha256"]:
+                action = "skip_invalid_backup"
+            else:
+                action = "restore"
             result.append({"mod": entry["mod"], "path": str(target),
-                           "backup": str(self._backup(entry["backup"])),
-                           "action": "restore" if current == entry["patched_sha256"] else "skip_changed"})
+                           "backup": str(backup), "action": action})
         return result
 
     def restore(self) -> dict:

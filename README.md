@@ -1,6 +1,6 @@
 # Spectator Tooltip Fix
 
-This repository contains the source for the **1.0.0-rc1 compatibility patcher**. The unsigned Windows executable is available in the [GitHub prerelease](https://github.com/mhen125/AoM-Retold-Spectator-Tooltip-Fix/releases/tag/v1.0.0-rc1). The **in-game mod is not yet published**; the executable only patches HUD files supplied by other installed mods. Public source is provided for review and testing.
+This repository contains the source for the **1.0.0-rc2 compatibility patcher**. The compact guided Windows executable is available in the [GitHub prerelease](https://github.com/mhen125/AoM-Retold-Spectator-Tooltip-Fix/releases/tag/v1.0.0-rc2). The **in-game mod is not yet published**; the executable only patches HUD files supplied by other installed mods. Public source is provided for review and testing.
 
 Spectator Tooltip Fix restores hover tooltips on command-grid icons during Age of Mythology: Retold replay playback when the replay panel is collapsed. The confirmed F1 change makes that collapsed panel stop catching the mouse. It does not change command bindings or gameplay. The public source contains only the companion patcher and synthetic fixtures; it contains no retail or third-party HUD XAML.
 
@@ -13,7 +13,7 @@ The companion cannot fix the retail file by itself. If no enabled mod supplies t
 
 ## Windows use
 
-Close Retold and start `SpectatorTooltipPatcher.exe`. It automatically discovers Retold profiles in your Windows Games folder, selects the profile with the most recently updated `myth-mod-status.json`, and **scans on launch without any path entry or clicks**. The selected path is always visible and can be changed if necessary; **Browse** is only a fallback. The table shows each status-listed provider, whether it is enabled or subscribed, its patch state, and which provider appears in effect based on status priority. Select **Patch Active** for enabled local providers or **Patch All** for enabled and disabled local providers. A confirmation lists the exact files and backup root before writing. **Verify** checks current files and ledger hashes; **Restore** writes original bytes only when a file still matches the patcher's recorded output.
+Close Retold and launch `SpectatorTooltipPatcher.exe`. The compact wizard automatically finds your game profile; no paths or manual scanning are required. Choose **Run the Patch**, select **Active mods** (recommended) or **All mods**, optionally include subscribed Workshop mods, and press **Confirm & Run Patch**. Originals are automatically backed up before writing. The result screen shows only other installed mods containing `HUD_MouseResources.xaml`, with clear per-mod outcomes, or **No conflicts.** when none are found. Choose **Restore Backup** on the first screen whenever a valid patcher backup can be restored. The GUI is intentionally compact and hides advanced file paths; the CLI retains detailed Scan/Verify and dry-run commands.
 
 Subscribed mods are excluded by default. Check **Include subscribed mods** to opt in; their updates may replace patched files. The game must be closed for Patch and Restore. If process detection fails, writes are refused. Scan, Verify, and the CLI dry run are read-only. The utility does not request elevation or update itself.
 
@@ -33,7 +33,7 @@ python -m spectator_tooltip_patcher restore --profile "<profile folder>" --dry-r
 
 The GUI automatically chooses the most recently updated profile when multiple profiles are detected. For CLI commands, omit `--profile` only if exactly one profile is discovered under `%USERPROFILE%\Games\Age of Mythology Retold\*\mods\myth-mod-status.json`; CLI writes require an explicit profile when multiple are present. Use `--mod-folder local/Name` to select one status-listed folder and `--include-subscribed` for subscribed copies. `--state-dir` is for isolated testing or portable state; retain its contents for Restore. The executable is a GUI build; CLI use is through Python source.
 
-Restore reviews every recorded patch for the selected profile, regardless of the optional mod-folder filter. The confirmation window lists each file it can restore.
+Restore checks every recorded patch for the selected profile, regardless of the optional mod-folder filter. The first screen offers **Restore Backup** only when a matching, verified backup exists; changed files are left alone.
 
 ## Compatibility and limits
 
@@ -45,7 +45,7 @@ The research build confirmed hover tooltips for train, rally, military unit, and
 
 Run `python -m unittest discover -s tests -v`. The project-local Windows build script is [scripts/build.ps1](scripts/build.ps1); run it with `powershell -File scripts/build.ps1` or pass `-Python` with a Python 3.11+ executable path. It installs pinned build packages in `.build-venv` and creates a GUI `.exe` and ZIP under ignored `dist/`. Build temp and caches also stay inside this directory. Windows builds should be smoke-tested on a clean Windows machine. The build does not bundle any game XAML.
 
-The private `private_stage/store_upload/Spectator Tooltip Fix` directory contains instructions only. It has no game asset or uploadable package. A full-file store package requires current-build preparation and rights review.
+The private, Git-ignored `private_stage/store_upload/Spectator Tooltip Fix` directory holds the separately staged game-derived mod package. It must never be included in public GitHub source or patcher EXE. Direct website distribution remains subject to the game-content redistribution review.
 
 ## Rights
 

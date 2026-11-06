@@ -207,6 +207,22 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(target.read_bytes(), original)
         self.assertFalse((self.base / "state").exists())
 
+    def test_restore_plan_requires_verified_backup(self):
+        target = self.add_mod("a")
+        tool = self.tool()
+        tool.patch()
+        plan = tool.restore_plan()
+        self.assertEqual(plan[0]["action"], "restore")
+        backup = Path(plan[0]["backup"])
+        original = backup.read_bytes()
+        backup.write_bytes(b"tampered")
+        self.assertEqual(tool.restore_plan()[0]["action"], "skip_invalid_backup")
+        self.assertEqual(patch_bytes(target.read_bytes())[0], "patched")
+        backup.unlink()
+        self.assertEqual(tool.restore_plan()[0]["action"], "skip_missing_backup")
+        backup.write_bytes(original)
+        self.assertEqual(tool.restore_plan()[0]["action"], "restore")
+
     def test_running_game_is_refused(self):
         if __import__("os").name != "nt":
             self.skipTest("Windows tasklist only")

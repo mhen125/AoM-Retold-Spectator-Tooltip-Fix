@@ -1,6 +1,6 @@
 # Separate release QA checklist
 
-Status: **Windows compatibility executable published as an explicitly labeled 1.0.0-rc1 GitHub prerelease** after synthetic tests and HPZ820 GUI smoke test. **Stable release and in-game Mods Store publication remain on HOLD** pending the checks below.
+Status: **Windows compatibility executable published as 1.0.0-rc1; compact guided 1.0.0-rc2 prepared for prerelease after verification**. **Stable release and in-game Mods Store publication remain on HOLD** pending the checks below.
 
 ## Source and artifact review
 
