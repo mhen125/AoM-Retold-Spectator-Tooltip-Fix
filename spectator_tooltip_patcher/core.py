@@ -155,6 +155,29 @@ def discover_profiles(home: Path | None = None) -> list[Path]:
                    and (p / "mods" / "myth-mod-status.json").is_file()), key=lambda p: p.name.casefold())
 
 
+def preferred_profile(profiles: list[Path]) -> Path | None:
+    """Choose the most recently updated mod profile for GUI read-only discovery.
+
+    Ties or inaccessible status files fail closed: let the user select instead.
+    This selection NEVER modifies any mod file.
+    """
+    ranked: list[tuple[int, Path]] = []
+    for profile in profiles:
+        status = profile / "mods" / "myth-mod-status.json"
+        try:
+            if status.is_symlink():
+                continue
+            ranked.append((status.stat().st_mtime_ns, profile))
+        except OSError:
+            continue
+    if not ranked:
+        return None
+    ranked.sort(key=lambda item: item[0], reverse=True)
+    if len(ranked) > 1 and ranked[0][0] == ranked[1][0]:
+        return None
+    return ranked[0][1]
+
+
 def default_store() -> Path:
     local = os.environ.get("LOCALAPPDATA")
     if not local:

@@ -1,4 +1,5 @@
 import json
+import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -7,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from spectator_tooltip_patcher.__main__ import main
-from spectator_tooltip_patcher.core import OLD, NEW, Profile, SafetyError, discover_profiles, game_not_running, mod_relative, patch_bytes, sha
+from spectator_tooltip_patcher.core import OLD, NEW, Profile, SafetyError, discover_profiles, game_not_running, mod_relative, patch_bytes, preferred_profile, sha
 
 
 def fixture(bom=True, newline="\r\n", anchors=1):
@@ -59,6 +60,21 @@ class CoreTests(unittest.TestCase):
         self.assertEqual(len(p.patch("all", True)["patched"]), 1)
         self.assertEqual((self.mods / "myth-mod-status.json").read_bytes(), original_status)
         self.assertEqual(p.verify()["unpatched_active"], [])
+
+    def test_preferred_profile_selects_recent_mod_status_and_ties_require_choice(self):
+        self.add_mod("a")
+        older = self.mods / "myth-mod-status.json"
+        other = self.base / "Games" / "Age of Mythology Retold" / "p2"
+        recent = other / "mods" / "myth-mod-status.json"
+        recent.parent.mkdir(parents=True)
+        recent.write_text('{"Mods":[]}', encoding="utf-8")
+        os.utime(older, ns=(1_000_000_000, 1_000_000_000))
+        os.utime(recent, ns=(2_000_000_000, 2_000_000_000))
+        self.assertEqual(preferred_profile([self.profile, other]), other)
+        self.assertEqual(preferred_profile([self.profile]), self.profile)
+        self.assertIsNone(preferred_profile([]))
+        os.utime(recent, ns=(1_000_000_000, 1_000_000_000))
+        self.assertIsNone(preferred_profile([self.profile, other]))
 
     def test_idempotence_and_exact_restore(self):
         target = self.add_mod("a", raw=fixture(bom=False, newline="\n"))

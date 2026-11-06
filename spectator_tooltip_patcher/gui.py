@@ -6,7 +6,7 @@ import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox, ttk
 
-from .core import Profile, SafetyError, discover_profiles
+from .core import Profile, SafetyError, discover_profiles, preferred_profile
 
 
 class App:
@@ -51,8 +51,16 @@ class App:
         outer.columnconfigure(1, weight=1)
         outer.rowconfigure(4, weight=3)
         outer.rowconfigure(6, weight=1)
-        if len(self.profiles) == 1:
-            self.profile.set(str(self.profiles[0]))
+        selected = preferred_profile(self.profiles)
+        if selected is not None:
+            self.profile.set(str(selected))
+            # Show the detected mods without requiring a Scan click.
+            # No file is modified until the user confirms Patch or Restore.
+            root.after_idle(self.scan)
+        elif self.profiles:
+            self.status.set("Multiple equally recent profiles found. Choose one, then Scan.")
+        else:
+            self.status.set("No Retold profile found automatically. Use Browse to select a profile.")
 
     def browse(self):
         chosen = filedialog.askdirectory(title="Select a Retold profile folder")
@@ -91,7 +99,12 @@ class App:
             plan = self.selected().plan("all", self.subscribed.get(), self.mod())
             self.rows(plan["rows"])
             self.show({"profile": plan["profile"], "backup_root": plan["state_dir"]})
-            self.status.set(f"Found {len(plan['rows'])} mod(s) with the target XAML. Scan made no changes.")
+            providers = sum(row["state"] != "missing" for row in plan["rows"])
+            patchable = sum(row["state"] == "patchable" for row in plan["rows"])
+            self.status.set(
+                f"Found {providers} HUD resource provider(s) among {len(plan['rows'])} mods; "
+                f"{patchable} patchable. Scan made no changes."
+            )
         self.guarded(work)
 
     def patch(self, scope: str):

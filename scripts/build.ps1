@@ -27,7 +27,7 @@ $exe = Join-Path $repo 'dist\SpectatorTooltipPatcher.exe'
 if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw 'Executable missing after build' }
 $zip = Join-Path $repo 'dist\SpectatorTooltipPatcher-windows.zip'
 if (Test-Path -LiteralPath $zip) { Remove-Item -LiteralPath $zip }
-Compress-Archive -LiteralPath $exe,(Join-Path $repo 'README.md'),(Join-Path $repo 'LICENSE-PROPOSED.md') -DestinationPath $zip
+Compress-Archive -LiteralPath $exe,(Join-Path $repo 'README.md'),(Join-Path $repo 'LICENSE') -DestinationPath $zip
 Get-FileHash -Algorithm SHA256 -LiteralPath $exe,$zip | Format-Table -AutoSize
 } finally {
     Pop-Location

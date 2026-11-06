@@ -4,7 +4,7 @@ Status: **HOLD for executable and in-game mod release**. The public source repos
 
 ## Source and artifact review
 
-- [ ] Approve code license and publisher identity. Confirm no game, third-party, profile, or research-only content in tracked files or release ZIP.
+- [x] MIT for original source and documentation, copyright mhen125; game and third-party materials are excluded. Confirm no game, third-party, profile, or research-only content in tracked files or release ZIP.
 - [ ] Build from a fresh project-local environment; record Python/PyInstaller versions, exact source commit, EXE and ZIP SHA-256, and clean Windows smoke-test result.
 - [ ] Repeat synthetic tests, including a Windows account with permitted symlink/junction creation. Review antivirus and SmartScreen behavior for an unsigned build.
 - [ ] Check GUI keyboard access, long-path display, confirmation lists, state directory, and failure messages.
