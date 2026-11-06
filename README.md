@@ -1,1 +1,52 @@
-# AoM-Retold-Spectator-Tooltip-Fix
+# Spectator Tooltip Fix
+
+This repository contains the source for the **1.0.0-rc1 compatibility patcher**. The Windows executable and in-game mod are separate releases and are **not yet published**. Public source is provided for review and testing.
+
+Spectator Tooltip Fix restores hover tooltips on command-grid icons during Age of Mythology: Retold replay playback when the replay panel is collapsed. The confirmed F1 change makes that collapsed panel stop catching the mouse. It does not change command bindings or gameplay. The public source contains only the companion patcher and synthetic fixtures; it contains no retail or third-party HUD XAML.
+
+## Two parts
+
+1. **In-game store mod:** install and enable **Spectator Tooltip Fix** through the game's mod manager once its separate package has passed rights and release review. The game replaces the entire `HUD_MouseResources.xaml` resource for a mod, so this package needs a build-specific full file and may conflict with other UI mods.
+2. **Companion utility:** `SpectatorTooltipPatcher.exe` patches the one F1 anchor in status-listed mod copies of `HUD_MouseResources.xaml`. Use it when another installed UI mod supplies that file. It never installs the store mod, edits the game executable or game install, or writes `myth-mod-status.json`.
+
+The companion cannot fix the retail file by itself. If no enabled mod supplies the target XAML, use the store mod. A mod update can overwrite a companion patch; use **Verify** afterward and patch again only after reviewing compatibility. Scan also shows status-listed mods whose target file is missing.
+
+## Windows use
+
+Close Retold. Start `SpectatorTooltipPatcher.exe`, select a discovered profile (or Browse to one), and press **Scan**. The table shows each status-listed provider, whether it is enabled or subscribed, its patch state, and which provider appears in effect based on status priority. Select **Patch Active** for enabled local providers or **Patch All** for enabled and disabled local providers. A confirmation lists the exact files and backup root before writing. **Verify** checks current files and ledger hashes; **Restore** writes original bytes only when a file still matches the patcher's recorded output.
+
+Subscribed mods are excluded by default. Check **Include subscribed mods** to opt in; their updates may replace patched files. The game must be closed for Patch and Restore. If process detection fails, writes are refused. Scan, Verify, and the CLI dry run are read-only. The utility does not request elevation or update itself.
+
+Backups and a per-profile ledger live under `%LOCALAPPDATA%\SpectatorTooltipPatcher\<profile-hash>`. Keep that folder until you no longer need to restore. A missing or changed mod file is left alone. If an operation is interrupted, the ledger records a pending entry and Verify reports the current hash state; Restore can finish when the file still matches the recorded patched hash.
+
+## CLI from source
+
+Python 3.11+ with Tkinter is required. From this directory:
+
+```powershell
+python -m spectator_tooltip_patcher scan --profile "<profile folder>" --scope all
+python -m spectator_tooltip_patcher patch --profile "<profile folder>" --scope active --dry-run
+python -m spectator_tooltip_patcher patch --profile "<profile folder>" --scope active
+python -m spectator_tooltip_patcher verify --profile "<profile folder>"
+python -m spectator_tooltip_patcher restore --profile "<profile folder>" --dry-run
+```
+
+Omit `--profile` only if exactly one profile is discovered under `%USERPROFILE%\Games\Age of Mythology Retold\*\mods\myth-mod-status.json`. Use `--mod-folder local/Name` to select one status-listed folder and `--include-subscribed` for subscribed copies. `--state-dir` is for isolated testing or portable state; retain its contents for Restore. The executable is a GUI build; CLI use is through Python source.
+
+Restore reviews every recorded patch for the selected profile, regardless of the optional mod-folder filter. The confirmation window lists each file it can restore.
+
+## Compatibility and limits
+
+The patcher changes only the existing replay-panel F1 anchor: `Style="{StaticResource CommandPanel}"` becomes an inline style whose `ReplayCommandPanel.IsCollapsed=True` trigger sets `IsHitTestVisible=False`. It requires exactly one anchor and well-formed UTF-8 XML. It recognizes earlier F1 builds as already patched. It preserves the original BOM choice and newline style, and skips files with no anchor, multiple anchors, mixed newlines, invalid UTF-8, or invalid XML. It never forces a best-effort rewrite. Other UI changes within the same XAML are kept byte-for-byte except that block.
+
+The research build confirmed hover tooltips for train, rally, military unit, and age-up technology icons in replay; broader icon and game-build coverage remains a release QA item. In a replay, clicking the age-up icon opened a local minor-god picker; choosing a god there was not tested. The companion utility does not add a click blocker. Live games were observed unchanged in the research session. See [release QA](RELEASE_QA.md) before public release.
+
+## Build and tests
+
+Run `python -m unittest discover -s tests -v`. The project-local Windows build script is [scripts/build.ps1](scripts/build.ps1); run it with `powershell -File scripts/build.ps1` or pass `-Python` with a Python 3.11+ executable path. It installs pinned build packages in `.build-venv` and creates a GUI `.exe` and ZIP under ignored `dist/`. Build temp and caches also stay inside this directory. Windows builds should be smoke-tested on a clean Windows machine. The build does not bundle any game XAML.
+
+The private `private_stage/store_upload/Spectator Tooltip Fix` directory contains instructions only. It has no game asset or uploadable package. A full-file store package requires current-build preparation and rights review.
+
+## Rights
+
+`LICENSE-PROPOSED.md` proposes MIT for the original patcher code and text only. Age of Mythology: Retold files and third-party mod files remain under their respective owners' terms and are excluded from this repository. The store upload package needs a separate rights review.
