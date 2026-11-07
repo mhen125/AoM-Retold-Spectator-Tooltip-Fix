@@ -1,5 +1,7 @@
 # Spectator Tooltip Fix
 
+[In-Game_Screenshot.png]
+
 This repository contains the source for the **1.0.0-rc2 compatibility patcher**. The compact guided Windows executable is available in the [GitHub prerelease](https://github.com/mhen125/AoM-Retold-Spectator-Tooltip-Fix/releases/tag/v1.0.0-rc2). The **in-game mod is not yet published**; the executable only patches HUD files supplied by other installed mods. Public source is provided for review and testing.
 
 Spectator Tooltip Fix restores hover tooltips on command-grid icons during Age of Mythology: Retold replay playback when the replay panel is collapsed. The confirmed F1 change makes that collapsed panel stop catching the mouse. It does not change command bindings or gameplay. The public source contains only the companion patcher and synthetic fixtures; it contains no retail or third-party HUD XAML.
