@@ -2,13 +2,13 @@
 
 ![In-Game Screenshot](/In-Game_Screenshot.png "In-Game Screenshot")
 
-This repository contains the source for the **1.0.0-rc2 compatibility patcher**. The compact guided Windows executable is available in the [GitHub prerelease](https://github.com/mhen125/AoM-Retold-Spectator-Tooltip-Fix/releases/tag/v1.0.0-rc2). The **in-game mod is not yet published**; the executable only patches HUD files supplied by other installed mods. Public source is provided for review and testing.
+This repository contains the source for the **1.0.0-rc2 compatibility patcher**. The compact guided Windows executable is available in the [GitHub prerelease](https://github.com/mhen125/AoM-Retold-Spectator-Tooltip-Fix/releases/tag/v1.0.0-rc2). The **in-game mod is live** in the Age of Mythology: Retold Mods Store as **Tooltip Fix For Spectator Mode**; the executable only patches HUD files supplied by other installed mods. Public source is provided for review and testing.
 
 Spectator Tooltip Fix restores hover tooltips on command-grid icons during Age of Mythology: Retold replay playback when the replay panel is collapsed. The confirmed F1 change makes that collapsed panel stop catching the mouse. It does not change command bindings or gameplay. The public source contains only the companion patcher and synthetic fixtures; it contains no retail or third-party HUD XAML.
 
 ## Two parts
 
-1. **In-game store mod:** install and enable **Spectator Tooltip Fix** through the game's mod manager once its separate package has passed rights and release review. The game replaces the entire `HUD_MouseResources.xaml` resource for a mod, so this package needs a build-specific full file and may conflict with other UI mods.
+1. **In-game store mod:** search the in-game Mods Store for **Tooltip Fix For Spectator Mode**, subscribe, and enable it in the mod manager. The game replaces the entire `HUD_MouseResources.xaml` resource for a mod, so this package needs a build-specific full file and may conflict with other UI mods.
 2. **Companion utility:** `SpectatorTooltipPatcher.exe` patches the one F1 anchor in status-listed mod copies of `HUD_MouseResources.xaml`. Use it when another installed UI mod supplies that file. It never installs the store mod, edits the game executable or game install, or writes `myth-mod-status.json`.
 
 The companion cannot fix the retail file by itself. If no enabled mod supplies the target XAML, use the store mod. A mod update can overwrite a companion patch; use **Verify** afterward and patch again only after reviewing compatibility. Scan also shows status-listed mods whose target file is missing.
@@ -47,7 +47,7 @@ The research build confirmed hover tooltips for train, rally, military unit, and
 
 Run `python -m unittest discover -s tests -v`. The project-local Windows build script is [scripts/build.ps1](scripts/build.ps1); run it with `powershell -File scripts/build.ps1` or pass `-Python` with a Python 3.11+ executable path. It installs pinned build packages in `.build-venv` and creates a GUI `.exe` and ZIP under ignored `dist/`. Build temp and caches also stay inside this directory. Windows builds should be smoke-tested on a clean Windows machine. The build does not bundle any game XAML.
 
-The private, Git-ignored `private_stage/store_upload/Spectator Tooltip Fix` directory holds the separately staged game-derived mod package. It must never be included in public GitHub source or patcher EXE. Direct website distribution remains subject to the game-content redistribution review.
+The private, Git-ignored `private_stage/store_upload/Spectator Tooltip Fix` directory holds the separately staged game-derived mod package. It must never be included in public GitHub source or patcher EXE. Build the store upload with `private_stage/package_store_flat.py`: the Mods Store needs `game/` at the root of the ZIP, and the first upload, which wrapped everything in an extra top-level folder, was flagged as a data mod that is not safe for multiplayer. Direct website distribution remains subject to the game-content redistribution review.
 
 ## Rights
 
