@@ -1,6 +1,6 @@
 # Separate release QA checklist
 
-Status: **Windows compatibility executable published as 1.0.0-rc1; compact guided 1.0.0-rc2 prepared for prerelease after verification**. **Stable release and in-game Mods Store publication remain on HOLD** pending the checks below.
+Status: **Windows compatibility executable published as 1.0.0-rc1; compact guided 1.0.0-rc2 prepared for prerelease after verification**. **The in-game store mod is live** in the Mods Store as **Tooltip Fix For Spectator Mode** (published 2026-11-11). **The stable patcher release remains on HOLD** pending the checks below; the unchecked store and in-game items stay open for the published mod.
 
 ## Source and artifact review
 
@@ -15,6 +15,12 @@ Status: **Windows compatibility executable published as 1.0.0-rc1; compact guide
 - [ ] Rebuild against the intended current Retold game build and record base/patched hashes; confirm F1 is the only XAML delta, XML parses, and the game loads it.
 - [ ] Set store title, version, description, and image to final reviewed values. Use the user's later screenshot after checking identifiers and rights.
 - [ ] Test install, disable, uninstall, and load priority through the game mod manager. Do not ship the old research candidate as-is.
+
+Store publication record (2026-11-11):
+
+- The first upload wrapped the mod in an extra top-level folder, so the store installed it as `<mod>/<folder>/game/...` and flagged it as a data mod that is not safe for multiplayer. The Mods Store needs `game/` at the ZIP root.
+- Re-uploaded as a ZIP with one entry, `game/ui_myth/Content/InGame/HUD_MouseResources.xaml`, built by the private `package_store_flat.py`. The XAML SHA-256 is `a52160695b5f914b8c860e95477d7df2c17e61f89c0f5955074702b4503f7b84`, the same file as the research RC. The retail `UI.bar` still matched base `b45494a0abcacf7ff44fd041757afdcef65bc595444e817fb733a09a0bde5ff1` on 2026-11-11.
+- The subscribed copy installed with `game/` at the mod root and the same XAML hash. A replay test with the store mod as the only enabled mod carrying F1 showed command-grid hover tooltips.
 
 ## In-game behavior
 
